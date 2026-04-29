@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="90" fill="#1a0a2e"/>
+
+  <!-- カクテルグラス（逆三角形） -->
+  <polygon points="256,340 120,130 392,130" fill="none" stroke="#ff69b4" stroke-width="18" stroke-linejoin="round"/>
+
+  <!-- グラスの脚 -->
+  <line x1="256" y1="340" x2="256" y2="410" stroke="#ff69b4" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- グラスの台座 -->
+  <line x1="200" y1="410" x2="312" y2="410" stroke="#ff69b4" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- 飲み物（グラスの中を塗る） -->
+  <polygon points="256,320 140,155 372,155" fill="#ff69b4" opacity="0.35"/>
+
+  <!-- 泡・ライン（アクセント） -->
+  <line x1="160" y1="200" x2="352" y2="200" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- チェリー -->
+  <circle cx="256" cy="118" r="22" fill="#ff1e6b"/>
+  <line x1="256" y1="96" x2="270" y2="75" stroke="#2ecc71" stroke-width="8" stroke-linecap="round"/>
+</svg>

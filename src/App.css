@@ -1,0 +1,226 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  background: #1a0a2e;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px;
+}
+
+/* ヘッダー */
+.app-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.header-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.app-title {
+  color: #f0c6e4;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* カウンターカード */
+.counter-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(240, 198, 228, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.counter-label {
+  color: #f0c6e4;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.counter-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.counter-value {
+  text-align: center;
+  flex: 1;
+}
+
+.count-number {
+  color: #ffffff;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.count-unit {
+  color: #f0c6e4;
+  font-size: 18px;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+/* ボタン */
+.btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.btn:active {
+  transform: scale(0.92);
+}
+
+.btn-plus {
+  background: #c45c8e;
+  color: #fff;
+}
+
+.btn-plus:hover {
+  background: #d46a9e;
+}
+
+.btn-minus {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f0c6e4;
+}
+
+.btn-minus:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* 合計 */
+.total-card {
+  background: rgba(196, 92, 142, 0.15);
+  border: 1px solid rgba(196, 92, 142, 0.4);
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.total-label {
+  color: #f0c6e4;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.total-value {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* 番犬キャラクター */
+.character-container {
+  position: fixed;
+  right: 16px;
+  bottom: 80px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.speech-bubble {
+  background: #ffffff;
+  color: #1a0a2e;
+  border: 2px solid #1a0a2e;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  max-width: 180px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 8px;
+  animation: bubbleAppear 0.2s ease-out;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1a0a2e;
+}
+
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #ffffff;
+  z-index: 1;
+}
+
+@keyframes bubbleAppear {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* リセットボタン */
+.btn-reset {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid rgba(240, 198, 228, 0.3);
+  border-radius: 12px;
+  color: #f0c6e4;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.2s;
+  opacity: 0.7;
+}
+
+.btn-reset:hover {
+  background: rgba(240, 198, 228, 0.08);
+  opacity: 1;
+}
