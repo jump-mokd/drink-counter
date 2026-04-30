@@ -2,18 +2,52 @@ import { useState, useRef } from 'react'
 import './App.css'
 
 const SELF_COMMENTS = {
-  2: 'おい…もう2杯目か',
-  4: '4杯だと？明日の仕事はどうする気だ',
-  6: '6杯か。自制心というものがないのか',
-  8: 'もう8杯か。最低だな、お前は',
+  2: [
+    'おい…もう2杯目か',
+    '早くも2杯か。節度ってものを知ってるか？',
+    '2杯。まあ許容範囲だが…油断するなよ',
+  ],
+  4: [
+    '4杯だと？明日の仕事はどうする気だ',
+    '4杯目…本当にやめないのか、お前は',
+    '4杯か。肝臓が泣いてるぞ',
+  ],
+  6: [
+    '6杯か。自制心というものがないのか',
+    '6杯も…お前の脳は機能してるのか',
+    '6杯目だと？情けない',
+  ],
+  8: [
+    'もう8杯か。最低だな、お前は',
+    '8杯…。もはや呆れて言葉もない',
+    '8杯目。帰れ。今すぐ帰れ',
+  ],
 }
 
 const HER_COMMENTS = {
-  2: 'そんなに飲ませてどうするつもりだ',
-  4: '4杯か。完全にカモにされてるぞ',
-  6: '6杯も…頭を使え。お前はバカか',
-  8: 'もう8杯か。財布を捨てたいのか',
+  2: [
+    'そんなに飲ませてどうするつもりだ',
+    '相手に2杯か。カモじゃないか',
+    '2杯も奢ったのか。先が思いやられるぞ',
+  ],
+  4: [
+    '4杯か。完全にカモにされてるぞ',
+    '4杯も…財布の中身が心配だ',
+    '相手に4杯。お前は慈善事業をやってるのか',
+  ],
+  6: [
+    '6杯も…頭を使え。お前はバカか',
+    '6杯目だと？絞られてることに気づけ',
+    '相手に6杯…本当に何を考えてるんだ',
+  ],
+  8: [
+    'もう8杯か。財布を捨てたいのか',
+    '8杯…。お前の金銭感覚を疑う',
+    '相手に8杯目。もう終わりだ、帰れ',
+  ],
 }
+
+const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 const Counter = ({ label, count, onIncrement, onDecrement }) => (
   <div className="counter-card">
@@ -152,13 +186,13 @@ const App = () => {
   const handleSelfIncrement = () => {
     const next = myCount + 1
     setMyCount(next)
-    if (SELF_COMMENTS[next]) showBubble(SELF_COMMENTS[next])
+    if (SELF_COMMENTS[next]) showBubble(pickRandom(SELF_COMMENTS[next]))
   }
 
   const handleHerIncrement = () => {
     const next = herCount + 1
     setHerCount(next)
-    if (HER_COMMENTS[next]) showBubble(HER_COMMENTS[next])
+    if (HER_COMMENTS[next]) showBubble(pickRandom(HER_COMMENTS[next]))
   }
 
   const handleReset = () => {
