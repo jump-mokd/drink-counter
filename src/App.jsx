@@ -40,7 +40,7 @@ const SpeechBubble = ({ message }) => (
 )
 
 const GuardDogCharacter = () => (
-  <svg width="170" height="165" viewBox="0 0 170 165" xmlns="http://www.w3.org/2000/svg">
+  <svg width="210" height="203" viewBox="0 0 170 165" xmlns="http://www.w3.org/2000/svg">
     {/* 足 / 脚 */}
     <ellipse cx="67" cy="157" rx="14" ry="7" fill="#0c0c2a"/>
     <ellipse cx="103" cy="157" rx="14" ry="7" fill="#0c0c2a"/>
