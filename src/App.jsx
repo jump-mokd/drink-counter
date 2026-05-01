@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 const SELF_COMMENTS = {
@@ -49,6 +49,85 @@ const HER_COMMENTS = {
 
 const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
+const getReviewScript = (myCount, herCount) => {
+  const steps = []
+
+  if (myCount >= 8) {
+    steps.push({
+      question: '呆れた。今日は何杯飲んだか分かってるのか？',
+      options: [
+        { label: '分かってる',     reaction: 'それでやめられないのか。救いようがないな' },
+        { label: '正直覚えてない', reaction: '…お前が一番ヤバい' },
+      ],
+    })
+    steps.push({
+      question: '家まで帰れるか？',
+      options: [
+        { label: '大丈夫',       reaction: 'そうか。倒れるなよ' },
+        { label: 'タクシー使う', reaction: '賢明な判断だ。珍しいな' },
+        { label: '分からない',   reaction: '…誰かに連絡しろ' },
+      ],
+    })
+  } else if (myCount >= 4) {
+    steps.push({
+      question: 'かなり飲んだな。何か言い訳はあるか？',
+      options: [
+        { label: 'ストレス解消', reaction: 'まあ、理由があるだけマシか' },
+        { label: '雰囲気で',     reaction: '雰囲気に流される意思の弱さよ' },
+        { label: '言い訳はない', reaction: '正直なのは評価してやる。次は行動で示せ' },
+      ],
+    })
+    steps.push({
+      question: '明日ちゃんと起きられると思うか？',
+      options: [
+        { label: '問題ない', reaction: 'なら良し。だが油断するな' },
+        { label: '微妙',     reaction: 'アラームを5個かけておけ' },
+        { label: '多分無理', reaction: '自業自得だ。諦めろ' },
+      ],
+    })
+  } else {
+    steps.push({
+      question: 'まずまずだな。今日は自制できたか？',
+      options: [
+        { label: 'できた',     reaction: 'そうか。その調子を保て' },
+        { label: 'まあまあ',   reaction: '自覚があるだけマシだ' },
+        { label: '微妙だった', reaction: '次回は気をつけろ。分かったか' },
+      ],
+    })
+  }
+
+  if (herCount >= 7) {
+    steps.push({
+      question: `相手に${herCount}杯も奢ったのか。財布は無事か？`,
+      options: [
+        { label: '大丈夫',     reaction: 'そうか。だが限度というものを覚えろ' },
+        { label: '少し痛い',   reaction: '当然だ。次は釘を刺せ' },
+        { label: '正直きつい', reaction: 'お前の財布に黙祷を捧げよう' },
+      ],
+    })
+  } else if (herCount >= 4) {
+    steps.push({
+      question: `相手に${herCount}杯か。楽しかったのか？`,
+      options: [
+        { label: '楽しかった',     reaction: 'ならまあ良し。だが奢りすぎるな' },
+        { label: 'まあまあ',       reaction: 'コスパを考えろ' },
+        { label: '楽しくなかった', reaction: '…お前は何をやってるんだ' },
+      ],
+    })
+  }
+
+  steps.push({
+    question: 'また来るつもりか？',
+    options: [
+      { label: 'また来る',  reaction: 'そうか。次は少し節度を持ってこい' },
+      { label: '考え中',    reaction: '今日の反省を忘れるなよ' },
+      { label: '当分いい',  reaction: '賢明だ。体を休めろ' },
+    ],
+  })
+
+  return steps
+}
+
 const Counter = ({ label, count, onIncrement, onDecrement }) => (
   <div className="counter-card">
     <div className="counter-label">{label}</div>
@@ -73,8 +152,8 @@ const SpeechBubble = ({ message }) => (
   </div>
 )
 
-const GuardDogCharacter = () => (
-  <svg width="210" height="203" viewBox="0 0 170 165" xmlns="http://www.w3.org/2000/svg">
+const GuardDogCharacter = ({ width = 210, height = 203 }) => (
+  <svg width={width} height={height} viewBox="0 0 170 165" xmlns="http://www.w3.org/2000/svg">
     {/* 足 / 脚 */}
     <ellipse cx="67" cy="157" rx="14" ry="7" fill="#0c0c2a"/>
     <ellipse cx="103" cy="157" rx="14" ry="7" fill="#0c0c2a"/>
@@ -169,9 +248,20 @@ const GuardDogCharacter = () => (
   </svg>
 )
 
-const App = () => {
-  const [myCount, setMyCount] = useState(0)
-  const [herCount, setHerCount] = useState(0)
+const HomeScreen = ({ onStart }) => (
+  <div className="home-screen">
+    <header className="app-header">
+      <div className="header-icon">🍸</div>
+      <h1 className="app-title">ドリンクカウンター</h1>
+    </header>
+    <div className="home-character">
+      <GuardDogCharacter />
+    </div>
+    <button className="btn-start" onClick={onStart}>飲み始める</button>
+  </div>
+)
+
+const CounterScreen = ({ myCount, herCount, setMyCount, setHerCount, onFinish }) => {
   const [bubble, setBubble] = useState(null)
   const bubbleTimer = useRef(null)
 
@@ -229,14 +319,120 @@ const App = () => {
         <button className="btn-reset" onClick={handleReset}>
           リセット
         </button>
+        <button className="btn-finish" onClick={onFinish}>
+          飲み終える
+        </button>
       </main>
 
       <div className="character-container">
         {bubble && <SpeechBubble message={bubble.message} />}
-        <GuardDogCharacter />
+        <div className={`character-wrapper${bubble ? ' character-active' : ''}`}>
+          <GuardDogCharacter />
+        </div>
       </div>
     </div>
   )
+}
+
+const ReviewScreen = ({ myCount, herCount, onHome }) => {
+  const [messages, setMessages] = useState([])
+  const [step, setStep] = useState(0)
+  const [script] = useState(() => getReviewScript(myCount, herCount))
+  const [done, setDone] = useState(false)
+  const messagesEndRef = useRef(null)
+
+  useEffect(() => {
+    setMessages([{ from: 'dog', text: script[0].question }])
+  }, [])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const handleAnswer = (option) => {
+    const userMsg = { from: 'user', text: option.label }
+    const reactionMsg = { from: 'dog', text: option.reaction }
+    const nextStep = step + 1
+
+    if (nextStep < script.length) {
+      const nextQuestion = { from: 'dog', text: script[nextStep].question }
+      setMessages(prev => [...prev, userMsg, reactionMsg, nextQuestion])
+      setStep(nextStep)
+    } else {
+      setMessages(prev => [...prev, userMsg, reactionMsg])
+      setDone(true)
+    }
+  }
+
+  const currentOptions = !done ? script[step]?.options : null
+
+  return (
+    <div className="review-screen">
+      <header className="app-header review-header">
+        <div className="header-icon">🍸</div>
+        <h1 className="app-title">振り返り</h1>
+      </header>
+
+      <div className="chat-messages">
+        {messages.map((msg, i) => (
+          <div key={i} className={`chat-row ${msg.from}`}>
+            {msg.from === 'dog' && (
+              <div className="chat-avatar">
+                <GuardDogCharacter width={48} height={46} />
+              </div>
+            )}
+            <div className={`chat-bubble ${msg.from}`}>{msg.text}</div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="chat-footer">
+        {currentOptions && (
+          <div className="chat-options">
+            {currentOptions.map((opt, i) => (
+              <button key={i} className="chat-option-btn" onClick={() => handleAnswer(opt)}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {done && (
+          <button className="btn-home" onClick={onHome}>ホームへ戻る</button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const App = () => {
+  const [screen, setScreen] = useState('home')
+  const [myCount, setMyCount] = useState(0)
+  const [herCount, setHerCount] = useState(0)
+
+  const handleStart = () => setScreen('counter')
+  const handleFinish = () => setScreen('review')
+  const handleHome = () => {
+    setMyCount(0)
+    setHerCount(0)
+    setScreen('home')
+  }
+
+  if (screen === 'home') {
+    return <HomeScreen onStart={handleStart} />
+  }
+  if (screen === 'counter') {
+    return (
+      <CounterScreen
+        myCount={myCount}
+        herCount={herCount}
+        setMyCount={setMyCount}
+        setHerCount={setHerCount}
+        onFinish={handleFinish}
+      />
+    )
+  }
+  return <ReviewScreen myCount={myCount} herCount={herCount} onHome={handleHome} />
 }
 
 export default App
