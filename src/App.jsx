@@ -128,6 +128,24 @@ const getReviewScript = (myCount, herCount) => {
   return steps
 }
 
+// --- localStorage helpers ---
+const HISTORY_KEY = 'drinkHistory'
+
+const loadHistory = () => {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+const saveRecord = (record) => {
+  const history = loadHistory()
+  localStorage.setItem(HISTORY_KEY, JSON.stringify([record, ...history]))
+}
+
+// ---
+
 const Counter = ({ label, count, onIncrement, onDecrement }) => (
   <div className="counter-card">
     <div className="counter-label">{label}</div>
@@ -248,7 +266,7 @@ const GuardDogCharacter = ({ width = 210, height = 203 }) => (
   </svg>
 )
 
-const HomeScreen = ({ onStart }) => (
+const HomeScreen = ({ onStart, onViewHistory }) => (
   <div className="home-screen">
     <header className="app-header">
       <div className="header-icon">🍸</div>
@@ -258,10 +276,11 @@ const HomeScreen = ({ onStart }) => (
       <GuardDogCharacter />
     </div>
     <button className="btn-start" onClick={onStart}>飲み始める</button>
+    <button className="btn-record" onClick={onViewHistory}>記録を見る</button>
   </div>
 )
 
-const CounterScreen = ({ myCount, herCount, setMyCount, setHerCount, onFinish }) => {
+const CounterScreen = ({ myCount, herCount, setMyCount, setHerCount, onFinish, onViewHistory }) => {
   const [bubble, setBubble] = useState(null)
   const bubbleTimer = useRef(null)
 
@@ -292,9 +311,10 @@ const CounterScreen = ({ myCount, herCount, setMyCount, setHerCount, onFinish })
 
   return (
     <div className="app">
-      <header className="app-header">
+      <header className="app-header counter-header">
         <div className="header-icon">🍸</div>
         <h1 className="app-title">ドリンクカウンター</h1>
+        <button className="btn-history-icon" onClick={onViewHistory} aria-label="記録を見る">📋</button>
       </header>
 
       <main className="app-main">
@@ -359,8 +379,23 @@ const ReviewScreen = ({ myCount, herCount, onHome }) => {
       setMessages(prev => [...prev, userMsg, reactionMsg, nextQuestion])
       setStep(nextStep)
     } else {
-      setMessages(prev => [...prev, userMsg, reactionMsg])
+      const finalMessages = [...messages, userMsg, reactionMsg]
+      setMessages(finalMessages)
       setDone(true)
+      // 会話を記録に保存
+      const now = new Date()
+      saveRecord({
+        id: Date.now().toString(),
+        date: now.toLocaleDateString('ja-JP', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          weekday: 'short',
+        }),
+        myCount,
+        herCount,
+        conversation: finalMessages,
+      })
     }
   }
 
@@ -405,10 +440,61 @@ const ReviewScreen = ({ myCount, herCount, onHome }) => {
   )
 }
 
+const HistoryScreen = ({ onBack }) => {
+  const [history] = useState(() => loadHistory())
+  const [expandedId, setExpandedId] = useState(null)
+
+  const toggleCard = (id) => {
+    setExpandedId(prev => prev === id ? null : id)
+  }
+
+  return (
+    <div className="history-screen">
+      <header className="app-header history-header">
+        <button className="btn-back" onClick={onBack} aria-label="戻る">←</button>
+        <div className="header-icon">📋</div>
+        <h1 className="app-title">記録</h1>
+      </header>
+
+      <div className="history-list">
+        {history.length === 0 ? (
+          <p className="history-empty">記録がありません</p>
+        ) : (
+          history.map((record) => (
+            <div
+              key={record.id}
+              className="history-card"
+              onClick={() => toggleCard(record.id)}
+            >
+              <div className="history-card-header">
+                <div className="history-card-info">
+                  <span className="history-date">{record.date}</span>
+                  <span className="history-counts">自分 {record.myCount}杯 / 相手 {record.herCount}杯</span>
+                </div>
+                <span className="history-toggle">{expandedId === record.id ? '▲' : '▼'}</span>
+              </div>
+              {expandedId === record.id && (
+                <div className="history-conversation">
+                  {record.conversation.map((msg, i) => (
+                    <div key={i} className={`history-msg ${msg.from}`}>
+                      {msg.text}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
 const App = () => {
   const [screen, setScreen] = useState('home')
   const [myCount, setMyCount] = useState(0)
   const [herCount, setHerCount] = useState(0)
+  const [historyFrom, setHistoryFrom] = useState('home')
 
   const handleStart = () => setScreen('counter')
   const handleFinish = () => setScreen('review')
@@ -417,9 +503,14 @@ const App = () => {
     setHerCount(0)
     setScreen('home')
   }
+  const handleViewHistory = (from) => {
+    setHistoryFrom(from)
+    setScreen('history')
+  }
+  const handleBackFromHistory = () => setScreen(historyFrom)
 
   if (screen === 'home') {
-    return <HomeScreen onStart={handleStart} />
+    return <HomeScreen onStart={handleStart} onViewHistory={() => handleViewHistory('home')} />
   }
   if (screen === 'counter') {
     return (
@@ -429,8 +520,12 @@ const App = () => {
         setMyCount={setMyCount}
         setHerCount={setHerCount}
         onFinish={handleFinish}
+        onViewHistory={() => handleViewHistory('counter')}
       />
     )
+  }
+  if (screen === 'history') {
+    return <HistoryScreen onBack={handleBackFromHistory} />
   }
   return <ReviewScreen myCount={myCount} herCount={herCount} onHome={handleHome} />
 }
