@@ -139,7 +139,20 @@ const loadHistory = () => {
   }
 }
 
-const saveRecord = (record) => {
+// idと日付はここで生成する（コンポーネント内で生成するとReactの純粋性ルールに反するため）
+const saveRecord = ({ myCount, herCount, conversation }) => {
+  const record = {
+    id: Date.now().toString(),
+    date: new Date().toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+    }),
+    myCount,
+    herCount,
+    conversation,
+  }
   const history = loadHistory()
   localStorage.setItem(HISTORY_KEY, JSON.stringify([record, ...history]))
 }
@@ -355,15 +368,11 @@ const CounterScreen = ({ myCount, herCount, setMyCount, setHerCount, onFinish, o
 }
 
 const ReviewScreen = ({ myCount, herCount, onHome }) => {
-  const [messages, setMessages] = useState([])
-  const [step, setStep] = useState(0)
   const [script] = useState(() => getReviewScript(myCount, herCount))
+  const [messages, setMessages] = useState(() => [{ from: 'dog', text: script[0].question }])
+  const [step, setStep] = useState(0)
   const [done, setDone] = useState(false)
   const messagesEndRef = useRef(null)
-
-  useEffect(() => {
-    setMessages([{ from: 'dog', text: script[0].question }])
-  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -383,19 +392,7 @@ const ReviewScreen = ({ myCount, herCount, onHome }) => {
       setMessages(finalMessages)
       setDone(true)
       // 会話を記録に保存
-      const now = new Date()
-      saveRecord({
-        id: Date.now().toString(),
-        date: now.toLocaleDateString('ja-JP', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'short',
-        }),
-        myCount,
-        herCount,
-        conversation: finalMessages,
-      })
+      saveRecord({ myCount, herCount, conversation: finalMessages })
     }
   }
 
