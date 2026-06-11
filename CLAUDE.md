@@ -41,7 +41,12 @@ docs/
 - `npm run preview`: ビルド結果を確認
 - `npm run lint`   : ESLint実行
 
+## スラッシュコマンド（.claude/commands/）
+- `/ship`        : lint→ビルド→コミット→push→デプロイ確認まで一気通貫
+- `/check`       : リリース前の品質チェック（lint・デバッグコード残り・SPEC整合・実機確認リスト）
+- `/session-end` : セッション終了処理（docs更新→メモリ記録→未コミット報告）
+
 ## 作業の進め方
 - 新機能はコンセプトを対話で深掘りしてから実装に入る（岡田さんの希望）
 - 仕様を変更したら `docs/SPEC.md` を、計画を変更したら `docs/ROADMAP.md` を更新する
-- ホスティングはVercel（GitHub: jump-mokd/drink-counter とリンク済み）。デプロイ後は本番URLでの動作確認まで行う
+- デプロイはVercelのGit連携: **mainへのpushで本番に自動デプロイされる**（GitHub: jump-mokd/drink-counter）。リリースは `/ship` を使う
